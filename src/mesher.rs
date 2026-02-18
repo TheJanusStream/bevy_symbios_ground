@@ -71,15 +71,15 @@ impl HeightMapMeshBuilder {
     /// quad is required to produce valid triangle geometry.
     pub fn build(&self, heightmap: &HeightMap) -> Mesh {
         assert!(
-            heightmap.width >= 2 && heightmap.height >= 2,
+            heightmap.width() >= 2 && heightmap.height() >= 2,
             "HeightMap must be at least 2×2 to generate a mesh (got {}×{})",
-            heightmap.width,
-            heightmap.height
+            heightmap.width(),
+            heightmap.height()
         );
 
-        let w = heightmap.width;
-        let h = heightmap.height;
-        let s = heightmap.scale;
+        let w = heightmap.width();
+        let h = heightmap.height();
+        let s = heightmap.scale();
 
         let vertex_count = w * h;
         let mut positions: Vec<[f32; 3]> = Vec::with_capacity(vertex_count);

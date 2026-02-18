@@ -35,8 +35,8 @@ use symbios_ground::HeightMap;
 /// // commands.spawn((collider, ...));
 /// ```
 pub fn build_heightfield_collider(heightmap: &HeightMap) -> Collider {
-    let w = heightmap.width;
-    let h = heightmap.height;
+    let w = heightmap.width();
+    let h = heightmap.height();
 
     // Avian's 3D heightfield expects `heights[row][col]` where:
     //   rows  → subdivisions along X axis (width)
