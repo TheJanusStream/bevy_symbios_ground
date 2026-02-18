@@ -2,7 +2,7 @@
 //!
 //! Converts a [`HeightMap`] into a Bevy [`Mesh`] with:
 //! - `TriangleList` topology
-//! - Smooth per-vertex normals (from central differences)
+//! - Smooth per-vertex normals (area-weighted average of adjacent face normals)
 //! - Tiling UV coordinates (world-space scaled by `uv_tile_size`)
 
 use bevy::asset::RenderAssetUsages;
@@ -13,8 +13,12 @@ use symbios_ground::HeightMap;
 /// Converts a [`HeightMap`] into a Bevy [`Mesh`].
 ///
 /// The mesh covers world space `[0, world_width] × [0, world_depth]` in the XZ
-/// plane, with heights along the Y axis. Normals are computed via central
-/// differences, matching [`HeightMap::get_normal_at`].
+/// plane, with heights along the Y axis. Per-vertex normals are computed from
+/// the actual mesh geometry: each triangle's unnormalized cross-product (which
+/// is proportional to its area) is accumulated at each of its three vertices,
+/// then normalized. This area-weighted averaging gives accurate shading for
+/// jagged or eroded terrain where the central-difference approximation diverges
+/// from the rendered surface.
 ///
 /// # UV Mapping
 ///
@@ -83,7 +87,6 @@ impl HeightMapMeshBuilder {
 
         let vertex_count = w * h;
         let mut positions: Vec<[f32; 3]> = Vec::with_capacity(vertex_count);
-        let mut normals: Vec<[f32; 3]> = Vec::with_capacity(vertex_count);
         let mut uvs: Vec<[f32; 2]> = Vec::with_capacity(vertex_count);
 
         for z in 0..h {
@@ -93,7 +96,6 @@ impl HeightMapMeshBuilder {
                 let world_y = heightmap.get(x, z);
 
                 positions.push([world_x, world_y, world_z]);
-                normals.push(heightmap.get_normal_at(world_x, world_z));
                 uvs.push([world_x / self.uv_tile_size, world_z / self.uv_tile_size]);
             }
         }
@@ -125,6 +127,40 @@ impl HeightMapMeshBuilder {
                 indices.push(br);
             }
         }
+
+        // Compute smooth per-vertex normals from the actual mesh geometry.
+        //
+        // For each triangle, accumulate the unnormalized face normal (cross
+        // product of two edges) at each of its three vertices.  The cross
+        // product magnitude equals twice the triangle's area, so larger
+        // triangles automatically contribute more to the averaged normal
+        // (area weighting).  Finally, normalize each accumulated vector.
+        //
+        // This gives better results than the central-difference formula from
+        // `HeightMap::get_normal_at` when the terrain is jagged or has been
+        // modified by erosion, because it reflects the actual rendered triangles
+        // rather than a continuous approximation of the underlying function.
+        let mut normals: Vec<Vec3> = vec![Vec3::ZERO; vertex_count];
+
+        for tri in indices.chunks_exact(3) {
+            let [i0, i1, i2] = [tri[0] as usize, tri[1] as usize, tri[2] as usize];
+            let p0 = Vec3::from(positions[i0]);
+            let p1 = Vec3::from(positions[i1]);
+            let p2 = Vec3::from(positions[i2]);
+            let face_normal = (p1 - p0).cross(p2 - p0);
+            normals[i0] += face_normal;
+            normals[i1] += face_normal;
+            normals[i2] += face_normal;
+        }
+
+        let normals: Vec<[f32; 3]> = normals
+            .iter()
+            .map(|n| {
+                let len = n.length();
+                // Degenerate vertex (zero contributions): default to +Y.
+                if len > f32::EPSILON { (*n / len).into() } else { [0.0, 1.0, 0.0] }
+            })
+            .collect();
 
         let mut mesh = Mesh::new(
             PrimitiveTopology::TriangleList,
