@@ -1,0 +1,9 @@
+/target
+**/*.rs.bk
+Cargo.lock
+/.claude
+/.chainlink
+CHANGELOG.md
+symbios-primer.sh
+symbios_primer_*
+.mcp.json

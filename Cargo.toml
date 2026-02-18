@@ -1,0 +1,37 @@
+[package]
+name = "bevy_symbios_ground"
+version = "0.1.0"
+edition = "2024"
+authors = ["Janus"]
+description = "Bevy integration for an algorithmic terrain engine."
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/TheJanusStream/bevy_symbios_ground"
+keywords = ["terrain", "procedural", "generative", "simulation"]
+categories = ["simulation", "game-development", "mathematics"]
+
+[features]
+default = []
+physics = ["dep:avian3d"]
+egui = ["dep:bevy_egui"]
+
+[dependencies]
+bevy = "0.18"
+symbios-ground = { path = "../symbios-ground" }
+bevy_egui = { version = "0.39", optional = true }
+
+[dependencies.avian3d]
+git = "https://github.com/avianphysics/avian"
+branch = "main"
+optional = true
+
+[dev-dependencies]
+serde_json = "1.0"
+criterion = "0.8"
+
+[[bench]]
+name = "bench_main"
+harness = false
+
+[profile.bench]
+debug = true
