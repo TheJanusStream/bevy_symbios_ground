@@ -115,11 +115,12 @@ pub fn sync_splat_texture(
     if !settings.dirty {
         return;
     }
-    settings.dirty = false;
 
     let Some(image) = images.get_mut(&splat_texture.handle) else {
+        // Image not yet available; keep dirty=true so we retry next frame.
         return;
     };
+    settings.dirty = false;
 
     let weight_map = &settings.weight_map;
 
