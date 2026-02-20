@@ -16,11 +16,10 @@ physics = ["dep:avian3d"]
 
 [dependencies]
 bevy = "0.18"
-symbios-ground = { path = "../symbios-ground" }
+symbios-ground = "0.1"
 
 [dependencies.avian3d]
-git = "https://github.com/avianphysics/avian"
-branch = "main"
+version = "0.5"
 optional = true
 
 [dev-dependencies]

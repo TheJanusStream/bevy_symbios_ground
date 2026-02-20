@@ -44,7 +44,7 @@ pub fn splat_to_image(weight_map: &WeightMap) -> Image {
         default(),
     );
 
-    // Repeat addressing so the splatmap tiles seamlessly with world-space UVs
+    // Clamp-to-edge so the splatmap does not wrap at terrain borders
     image.sampler = ImageSampler::Descriptor(ImageSamplerDescriptor {
         address_mode_u: ImageAddressMode::ClampToEdge,
         address_mode_v: ImageAddressMode::ClampToEdge,
