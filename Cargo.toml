@@ -1,6 +1,6 @@
 [package]
 name = "bevy_symbios_ground"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["Janus"]
 description = "Bevy integration for an algorithmic terrain engine."
