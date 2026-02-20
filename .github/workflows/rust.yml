@@ -1,29 +1,28 @@
 name: Rust
 
 on:
-    push:
-        branches: ["master", "main"]
-    pull_request:
-        branches: ["master", "main"]
+  push:
+    branches: ["master", "main"]
+  pull_request:
+    branches: ["master", "main"]
 
 env:
-    CARGO_TERM_COLOR: always
+  CARGO_TERM_COLOR: always
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-            - name: Check Formatting
-              run: cargo fmt -- --check
+      - name: Check Formatting
+        run: cargo fmt -- --check
 
-            - name: Clippy (Linting)
-              run: cargo clippy -- -D warnings
+      - name: Clippy (Linting)
+        run: cargo clippy -- -D warnings
 
-            - name: Build
-              run: cargo build --verbose
+      - name: Build
+        run: cargo build --verbose
 
-            - name: Run Tests
-              run: cargo test --verbose
-
+      - name: Run Tests
+        run: cargo test --verbose
