@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Wayland dependencies
-        run: sudo apt-get update && sudo apt-get install -y libwayland-dev pkg-config libasound2-dev libudev-sys
+        run: sudo apt-get update && sudo apt-get install -y libwayland-dev pkg-config libasound2-dev libudev-dev
 
       - name: Check Formatting
         run: cargo fmt -- --check
