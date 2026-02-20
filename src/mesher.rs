@@ -172,8 +172,7 @@ impl HeightMapMeshBuilder {
                 // (area weighting). Reflects the actual rendered geometry.
                 let mut acc: Vec<Vec3> = vec![Vec3::ZERO; vertex_count];
                 for tri in indices.chunks_exact(3) {
-                    let [i0, i1, i2] =
-                        [tri[0] as usize, tri[1] as usize, tri[2] as usize];
+                    let [i0, i1, i2] = [tri[0] as usize, tri[1] as usize, tri[2] as usize];
                     let p0 = Vec3::from(positions[i0]);
                     let p1 = Vec3::from(positions[i1]);
                     let p2 = Vec3::from(positions[i2]);
@@ -243,17 +242,20 @@ fn compute_normals_sobel(heightmap: &HeightMap) -> Vec<[f32; 3]> {
             //  -1  0  1
             //  -2  0  2
             //  -1  0  1
-            let gx = -sample(xi, zi, -1, -1) + sample(xi, zi, 1, -1)
-                + -2.0 * sample(xi, zi, -1, 0) + 2.0 * sample(xi, zi, 1, 0)
-                + -sample(xi, zi, -1, 1) + sample(xi, zi, 1, 1);
+            let gx = -sample(xi, zi, -1, -1)
+                + sample(xi, zi, 1, -1)
+                + -2.0 * sample(xi, zi, -1, 0)
+                + 2.0 * sample(xi, zi, 1, 0)
+                + -sample(xi, zi, -1, 1)
+                + sample(xi, zi, 1, 1);
 
             // Sobel Z kernel: vertical gradient (dh/dz direction)
             //  -1 -2 -1
             //   0  0  0
             //   1  2  1
-            let gz = -sample(xi, zi, -1, -1) - 2.0 * sample(xi, zi, 0, -1)
-                - sample(xi, zi, 1, -1)
-                + sample(xi, zi, -1, 1) + 2.0 * sample(xi, zi, 0, 1)
+            let gz = -sample(xi, zi, -1, -1) - 2.0 * sample(xi, zi, 0, -1) - sample(xi, zi, 1, -1)
+                + sample(xi, zi, -1, 1)
+                + 2.0 * sample(xi, zi, 0, 1)
                 + sample(xi, zi, 1, 1);
 
             let n = Vec3::new(-gx, 8.0 * s, -gz);
