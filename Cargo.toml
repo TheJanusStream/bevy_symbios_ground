@@ -13,12 +13,10 @@ categories = ["simulation", "game-development", "mathematics"]
 [features]
 default = []
 physics = ["dep:avian3d"]
-egui = ["dep:bevy_egui"]
 
 [dependencies]
 bevy = "0.18"
 symbios-ground = { path = "../symbios-ground" }
-bevy_egui = { version = "0.39", optional = true }
 
 [dependencies.avian3d]
 git = "https://github.com/avianphysics/avian"

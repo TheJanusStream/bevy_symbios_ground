@@ -16,7 +16,6 @@
 //!
 //! - `physics`: Enables [`collider`] and [`collider::build_heightfield_collider`]
 //!   for Avian3D integration.
-//! - `egui`: Reserved for future egui-based terrain editing UI.
 //!
 //! # Example
 //!
