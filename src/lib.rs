@@ -51,7 +51,7 @@ pub mod splat;
 #[cfg(feature = "physics")]
 pub mod collider;
 
-pub use mesher::HeightMapMeshBuilder;
+pub use mesher::{HeightMapMeshBuilder, NormalMethod};
 pub use splat::{GroundMaterialSettings, SplatTexture, splat_to_image, sync_splat_texture};
 
 #[cfg(feature = "physics")]

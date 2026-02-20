@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_symbios_ground::HeightMapMeshBuilder;
+use bevy_symbios_ground::{HeightMapMeshBuilder, NormalMethod};
 use symbios_ground::HeightMap;
 
 fn flat_map(w: usize, h: usize, scale: f32) -> HeightMap {
@@ -135,6 +135,67 @@ fn positions_far_corner_matches_scale() {
 fn panics_on_1x1_map() {
     let map = flat_map(1, 1, 1.0);
     HeightMapMeshBuilder::new().build(&map);
+}
+
+#[test]
+fn sobel_flat_normals_point_up() {
+    let map = flat_map(4, 4, 1.0);
+    let mesh = HeightMapMeshBuilder::new()
+        .with_normal_method(NormalMethod::Sobel)
+        .build(&map);
+    let normals = mesh
+        .attribute(Mesh::ATTRIBUTE_NORMAL)
+        .expect("mesh must have normals")
+        .as_float3()
+        .expect("normals must be Float32x3");
+    for n in normals {
+        assert!(
+            n[1] > 0.99,
+            "Sobel flat terrain normal y should be ~1.0, got {:?}",
+            n
+        );
+    }
+}
+
+#[test]
+fn sobel_ramp_normals_have_x_component() {
+    let map = ramp_map(8, 8, 1.0);
+    let mesh = HeightMapMeshBuilder::new()
+        .with_normal_method(NormalMethod::Sobel)
+        .build(&map);
+    let normals = mesh
+        .attribute(Mesh::ATTRIBUTE_NORMAL)
+        .unwrap()
+        .as_float3()
+        .unwrap();
+    // Interior vertex on an X-slope must have a non-zero X normal component.
+    let interior = normals[1 * 8 + 4]; // z=1, x=4
+    assert!(
+        interior[0].abs() > 0.01,
+        "Sobel ramp normal should have X component, got {:?}",
+        interior
+    );
+}
+
+#[test]
+fn sobel_normal_is_unit_length() {
+    let map = ramp_map(6, 6, 2.0);
+    let mesh = HeightMapMeshBuilder::new()
+        .with_normal_method(NormalMethod::Sobel)
+        .build(&map);
+    let normals = mesh
+        .attribute(Mesh::ATTRIBUTE_NORMAL)
+        .unwrap()
+        .as_float3()
+        .unwrap();
+    for n in normals {
+        let len = (n[0] * n[0] + n[1] * n[1] + n[2] * n[2]).sqrt();
+        assert!(
+            (len - 1.0).abs() < 1e-5,
+            "Sobel normal should be unit length, got length {len} for {:?}",
+            n
+        );
+    }
 }
 
 #[test]
